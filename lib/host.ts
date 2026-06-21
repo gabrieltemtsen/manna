@@ -6,10 +6,10 @@
  * can open Manna in the host and connect with one click.
  *
  * Docs: https://docs.aboutcircles.com/miniapps/create-or-connect-a-circles-account-from-a-mini-app
- *   → https://circles-dev.gnosis.io/playground?url=<your-app-url>
+ *   → https://circles.gnosis.io/playground?url=<your-app-url>
  */
 
-export const CIRCLES_PLAYGROUND = 'https://circles-dev.gnosis.io/playground';
+export const CIRCLES_PLAYGROUND = 'https://circles.gnosis.io/playground';
 
 /** The public URL the playground should embed (this app's origin). */
 export function appUrl(): string {

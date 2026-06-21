@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { Wheat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StatusBar } from '@/components/layout/StatusBar';
+import { Tooltip } from '@/components/ui/tooltip';
 
 export function ConsoleShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -46,6 +47,14 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
                   {n.label}
                 </Link>
               ))}
+              <Tooltip
+                side="bottom"
+                content="Manna is an AI agent for Circles. Your basic income (CRC) decays ~7%/yr — Manna reads your real trust graph and routes it to people you choose, with a reason and a traced payment path for each gift. You approve; it sends."
+              >
+                <span className="mono ml-0.5 inline-flex size-5 cursor-help items-center justify-center rounded-full border border-border text-[11px] text-muted-foreground transition-colors hover:text-foreground">
+                  ?
+                </span>
+              </Tooltip>
             </nav>
           </div>
           <StatusBar />

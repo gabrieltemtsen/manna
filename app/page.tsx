@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useSession } from '@/components/session/SessionProvider';
 import { AgentConsole } from '@/components/manna/AgentConsole';
-import { AddressLookup } from '@/components/manna/AddressLookup';
+import { ConnectPanel } from '@/components/manna/ConnectPanel';
 import { GraphPanel, HoldingsPanel, ActivityPanel } from '@/components/manna/SidePanels';
 
 export default function Page() {
@@ -25,7 +25,7 @@ export default function Page() {
       </div>
 
       {/* read-only / connect strip */}
-      {!canSend && <AddressLookup />}
+      {!canSend && <ConnectPanel />}
 
       {/* main grid */}
       <div className="grid gap-4 lg:grid-cols-[1fr_300px]">

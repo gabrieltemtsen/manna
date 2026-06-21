@@ -1,13 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Loader2, Wallet } from 'lucide-react';
 import { useSession } from '@/components/session/SessionProvider';
+import { useWallet } from '@/hooks/use-wallet';
 import { ANNUAL_DEMURRAGE } from '@/lib/demurrage';
 import { shortenAddress } from '@/lib/format';
 
 /** Compact live status: connection, active avatar, balance, decay rate. */
 export function StatusBar() {
   const { address, source, snapshot, loading } = useSession();
+  const { isMiniappHost, connect, connecting } = useWallet();
   const [, setTick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
@@ -28,6 +31,21 @@ export function StatusBar() {
             −{perSecond.toFixed(7)}/s
           </span>
         </span>
+      )}
+
+      {isMiniappHost && !connected && (
+        <button
+          onClick={connect}
+          disabled={connecting}
+          className="mono inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground disabled:opacity-50"
+        >
+          {connecting ? (
+            <Loader2 className="size-3 animate-spin" />
+          ) : (
+            <Wallet className="size-3" />
+          )}
+          connect
+        </button>
       )}
 
       <span

@@ -1,0 +1,163 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.85);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.9);
+}
+
+:root {
+  /* Mission-control dark. Near-black slate, terminal green + amber accents. */
+  --background: oklch(0.17 0.012 165);
+  --foreground: oklch(0.93 0.012 150);
+
+  --card: oklch(0.215 0.014 168);
+  --card-foreground: oklch(0.93 0.012 150);
+
+  --popover: oklch(0.24 0.016 168);
+  --popover-foreground: oklch(0.95 0.01 150);
+
+  --primary: oklch(0.78 0.16 150);          /* terminal green */
+  --primary-foreground: oklch(0.16 0.02 165);
+
+  --secondary: oklch(0.26 0.015 168);
+  --secondary-foreground: oklch(0.9 0.01 150);
+
+  --muted: oklch(0.26 0.012 168);
+  --muted-foreground: oklch(0.66 0.015 155);
+
+  --accent: oklch(0.82 0.15 85);            /* grain amber */
+  --accent-foreground: oklch(0.18 0.02 165);
+
+  --destructive: oklch(0.66 0.18 25);
+
+  --border: oklch(0.30 0.014 168);
+  --input: oklch(0.30 0.014 168);
+  --ring: oklch(0.78 0.16 150);
+
+  --green: oklch(0.80 0.17 150);
+  --amber: oklch(0.83 0.15 85);
+  --red: oklch(0.68 0.18 25);
+  --blue: oklch(0.74 0.12 230);
+
+  --radius: 0.55rem;
+
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--green) 35%, transparent);
+  }
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .glow-green {
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--green) 40%, transparent),
+      0 0 24px -8px color-mix(in oklch, var(--green) 60%, transparent);
+  }
+  .text-green { color: var(--green); }
+  .text-amber { color: var(--amber); }
+  .text-red { color: var(--red); }
+  .text-blue { color: var(--blue); }
+  .bg-green-soft { background: color-mix(in oklch, var(--green) 16%, transparent); }
+  .bg-amber-soft { background: color-mix(in oklch, var(--amber) 16%, transparent); }
+  .bg-red-soft { background: color-mix(in oklch, var(--red) 16%, transparent); }
+  .hairline { border-color: color-mix(in oklch, var(--foreground) 12%, transparent); }
+}
+
+/* Scanline / grid backdrop for the mission-control feel. */
+.grid-bg {
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(80% 70% at 50% 0%, black, transparent 90%);
+}
+
+/* ── Motion ─────────────────────────────────────────────────────────────── */
+@keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.caret { animation: blink 1.05s steps(1) infinite; }
+
+@keyframes log-in {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.log-in { animation: log-in 0.28s ease-out both; }
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in oklch, var(--green) 60%, transparent); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 5px color-mix(in oklch, var(--green) 0%, transparent); }
+}
+.live-dot { animation: live-pulse 2s ease-out infinite; }
+
+@keyframes dash-move { to { stroke-dashoffset: -16; } }
+.dash { stroke-dasharray: 4 4; animation: dash-move 0.9s linear infinite; }
+
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(220%); }
+}
+.scan::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--green) 22%, transparent), transparent);
+  animation: scan 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret, .log-in, .live-dot, .dash, .scan::after { animation: none; }
+}

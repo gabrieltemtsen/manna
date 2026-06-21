@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ArrowUp,
   Check,
+  ChevronDown,
   CircleSlash,
   Loader2,
   X,
@@ -11,6 +12,7 @@ import {
 import { useSession } from '@/components/session/SessionProvider';
 import { ProfileChip } from '@/components/profile/ProfileChip';
 import { TrustPath } from '@/components/manna/TrustPath';
+import { BootIntro } from '@/components/manna/BootIntro';
 import { Tooltip } from '@/components/ui/tooltip';
 import { formatCrc } from '@/lib/format';
 import type { Allocation, Candidate, Hex, RoundPlan } from '@/lib/types';
@@ -62,20 +64,23 @@ export function AgentConsole({
   const { address, candidates, canSend, source, snapshot, refresh } =
     useSession();
 
-  const [lines, setLines] = useState<Line[]>([
-    { id: nid(), tone: 'sys', text: 'manna agent ready. it reads your real Circles trust graph and proposes gifts for your decaying CRC.' },
-    { id: nid(), tone: 'sys', text: 'type what you care about below — e.g. "support local food". the agent decides who + why; you approve.' },
-  ]);
+  const [lines, setLines] = useState<Line[]>([]);
   const [phase, setPhase] = useState<'idle' | 'planning' | 'review' | 'executing' | 'done'>('idle');
   const [mission, setMission] = useState('');
   const [budget, setBudget] = useState(12);
   const [plan, setPlan] = useState<RoundPlan | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
+  const [bootDone, setBootDone] = useState(false);
 
   const logEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [lines, rows, phase]);
+
+  // After the intro types out, draw the user to the input.
+  const hintActive =
+    bootDone && phase === 'idle' && !mission && lines.length === 0 && !plan;
 
   function push(tone: Tone, text: string) {
     setLines((prev) => [...prev, { id: nid(), tone, text }]);
@@ -245,7 +250,13 @@ export function AgentConsole({
 
       {/* log */}
       <div className="flex-1 overflow-y-auto px-3 py-3">
-        <div className="space-y-1">
+        <BootIntro
+          onDone={() => {
+            setBootDone(true);
+            inputRef.current?.focus();
+          }}
+        />
+        <div className="mt-1 space-y-1">
           {lines.map((l) => (
             <p key={l.id} className={`log-in mono text-xs leading-relaxed ${TONE_CLS[l.tone]}`}>
               <span className="mr-1.5 opacity-70">{TONE_PREFIX[l.tone]}</span>
@@ -345,12 +356,23 @@ export function AgentConsole({
 
       {/* prompt */}
       <div className="border-t border-border p-2.5">
+        {hintActive && (
+          <div className="mb-1.5 flex items-center gap-1.5 text-green">
+            <ChevronDown className="size-3.5 animate-bounce" />
+            <span className="mono text-[11px]">
+              {address ? 'start here — type below or tap a suggestion' : 'load an avatar above, then type here'}
+            </span>
+          </div>
+        )}
         {phase === 'idle' && (
           <div className="mb-2 flex flex-wrap gap-1.5">
             {PRESETS.map((p) => (
               <button
                 key={p}
-                onClick={() => setMission(p)}
+                onClick={() => {
+                  setMission(p);
+                  inputRef.current?.focus();
+                }}
                 className="mono rounded-full border border-border bg-secondary/40 px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground"
               >
                 {p}
@@ -358,9 +380,14 @@ export function AgentConsole({
             ))}
           </div>
         )}
-        <div className="flex items-center gap-2">
+        <div
+          className={`flex items-center gap-2 rounded-md px-1 transition-shadow ${
+            hintActive ? 'glow-green' : ''
+          }`}
+        >
           <span className="mono text-green">$</span>
           <input
+            ref={inputRef}
             value={mission}
             onChange={(e) => setMission(e.target.value)}
             onKeyDown={(e) => {

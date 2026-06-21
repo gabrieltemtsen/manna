@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Loader2, Route, Zap } from 'lucide-react';
-import { shortenAddress, formatCrc } from '@/lib/format';
+import { formatCrc } from '@/lib/format';
+import { useName } from '@/components/profile/Name';
 import type { Hex, TrustPath as TrustPathData } from '@/lib/types';
 
 /**
@@ -59,20 +60,13 @@ export function TrustPath({
             {path.hops.map((h, i) => {
               const isFirst = i === 0;
               const isLast = i === path.hops.length - 1;
-              const label = isFirst ? 'you' : isLast ? toName || shortenAddress(h) : shortenAddress(h);
               return (
                 <span key={`${h}-${i}`} className="flex items-center gap-1">
-                  <span
-                    className={`mono rounded px-1.5 py-0.5 text-[10px] ${
-                      isFirst
-                        ? 'bg-green-soft text-green'
-                        : isLast
-                          ? 'bg-amber-soft text-amber'
-                          : 'border border-border text-foreground'
-                    }`}
-                  >
-                    {label}
-                  </span>
+                  <HopChip
+                    address={h}
+                    label={isFirst ? 'you' : isLast ? toName : undefined}
+                    tone={isFirst ? 'green' : isLast ? 'amber' : 'plain'}
+                  />
                   {!isLast && <span className="text-green">→</span>}
                 </span>
               );
@@ -96,5 +90,30 @@ export function TrustPath({
         </div>
       )}
     </div>
+  );
+}
+
+/** A single hop chip; resolves the avatar's name unless a label is forced. */
+function HopChip({
+  address,
+  label,
+  tone,
+}: {
+  address: Hex;
+  label?: string;
+  tone: 'green' | 'amber' | 'plain';
+}) {
+  const resolved = useName(address);
+  const text = label ?? resolved;
+  const cls =
+    tone === 'green'
+      ? 'bg-green-soft text-green'
+      : tone === 'amber'
+        ? 'bg-amber-soft text-amber'
+        : 'border border-border text-foreground';
+  return (
+    <span className={`mono max-w-[8rem] truncate rounded px-1.5 py-0.5 text-[10px] ${cls}`}>
+      {text}
+    </span>
   );
 }

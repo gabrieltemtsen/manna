@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Sparkle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProfileChip } from '@/components/profile/ProfileChip';
+import { Name } from '@/components/profile/Name';
 import { formatCrc, formatRelative } from '@/lib/format';
 import type { Round } from '@/lib/types';
 
@@ -97,9 +98,11 @@ export function ImpactGarden() {
                   <span
                     key={a.to}
                     title={a.reason}
-                    className="mono rounded-full bg-secondary/60 px-2 py-0.5 text-[10px] tabular-nums text-foreground"
+                    className="mono inline-flex max-w-[10rem] items-center gap-1 rounded-full bg-secondary/60 px-2 py-0.5 text-[10px] text-foreground"
                   >
-                    {formatCrc(a.amount)}→{a.to.slice(0, 6)}
+                    <span className="tabular-nums text-green">{formatCrc(a.amount)}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <Name address={a.to} className="truncate" />
                   </span>
                 ))}
                 {r.allocations.length > 6 && (

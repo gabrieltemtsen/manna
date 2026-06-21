@@ -67,6 +67,7 @@ type AnySdk = {
     };
     profile: {
       getProfileView: (a: Address) => Promise<RawProfileView>;
+      getProfileByAddress: (a: Address) => Promise<RawProfile | null>;
       getProfileByAddressBatch: (
         a: (Address | null)[]
       ) => Promise<(RawProfile | null)[]>;
@@ -163,6 +164,36 @@ export async function getSnapshot(address: Address): Promise<Snapshot> {
     /* keep defaults */
   }
   return out;
+}
+
+// ─── Profile name resolution (shared, cached) ────────────────────────────────
+
+const _nameCache = new Map<string, string | undefined>();
+const _nameInflight = new Map<string, Promise<string | undefined>>();
+
+/** Resolve a single avatar's display name (cached). Undefined if unnamed. */
+export async function getProfileName(
+  address: Address
+): Promise<string | undefined> {
+  const key = address.toLowerCase();
+  if (_nameCache.has(key)) return _nameCache.get(key);
+  if (_nameInflight.has(key)) return _nameInflight.get(key)!;
+  const p = (async () => {
+    try {
+      const sdk = await getSdk();
+      const prof = await sdk.rpc.profile.getProfileByAddress(address);
+      const name = prof?.name?.trim() || undefined;
+      _nameCache.set(key, name);
+      return name;
+    } catch {
+      _nameCache.set(key, undefined);
+      return undefined;
+    } finally {
+      _nameInflight.delete(key);
+    }
+  })();
+  _nameInflight.set(key, p);
+  return p;
 }
 
 // ─── Trust graph → candidates ────────────────────────────────────────────────

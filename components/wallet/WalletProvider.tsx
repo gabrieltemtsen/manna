@@ -55,10 +55,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     // The SDK touches `window`/`parent`, so it must be dynamically imported
     // inside an effect rather than loaded at module top-level.
     import('@aboutcircles/miniapp-sdk')
-      .then(({ onWalletChange, isMiniappMode, requestCreateAccount }) => {
+      .then((mod) => {
         if (cancelled) return;
+        const { onWalletChange, isMiniappMode } = mod;
         setIsMiniappHost(isMiniappMode());
-        requestRef.current = requestCreateAccount as RequestCreateAccount;
+        // requestCreateAccount lands in miniapp-sdk ≥0.1.44; read it
+        // defensively so older bundles degrade gracefully.
+        const rca = (
+          mod as { requestCreateAccount?: RequestCreateAccount }
+        ).requestCreateAccount;
+        requestRef.current = rca ?? null;
         unsubscribe = onWalletChange((addr) =>
           setAddress((addr as `0x${string}` | null) ?? null)
         );

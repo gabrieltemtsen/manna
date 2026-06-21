@@ -69,7 +69,7 @@ export function StatusBar() {
         {loading
           ? 'syncing…'
           : address
-            ? shortenAddress(address)
+            ? snapshot?.name?.trim() || shortenAddress(address)
             : 'offline'}
       </span>
     </div>
